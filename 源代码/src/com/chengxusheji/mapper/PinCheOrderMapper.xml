@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.PinCheOrderMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加拼车订单记录 -->
+	<insert id="addPinCheOrder" parameterType="pinCheOrder">
+		insert into t_pinCheOrder(pinCheObj,userObj,personNum,orderTime) values 
+		(#{pinCheObj.pincheId},#{userObj.user_name},#{personNum},#{orderTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询拼车订单记录 -->
+	<select id="queryPinCheOrder" resultMap="pinCheOrderMap" >
+		select t_pinCheOrder.* from t_pinCheOrder,t_pinChe,t_userInfo ${where} and t_pinCheOrder.pinCheObj = t_pinChe.pincheId and t_pinCheOrder.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="pinCheOrderMap" type="pinCheOrder">
+        <id property="orderId" column="orderId" />
+        <association property="pinCheObj" column="pinCheObj" select="com.chengxusheji.mapper.PinCheMapper.getPinChe" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有拼车订单记录 -->
+	<select id="queryPinCheOrderList" resultMap="pinCheOrderMap" >
+		select t_pinCheOrder.* from t_pinCheOrder,t_pinChe,t_userInfo ${where} and t_pinCheOrder.pinCheObj = t_pinChe.pincheId and t_pinCheOrder.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的拼车订单记录数 -->
+	<select id="queryPinCheOrderCount" resultType="int">
+		select count(*) from t_pinCheOrder,t_pinChe,t_userInfo ${where} and t_pinCheOrder.pinCheObj = t_pinChe.pincheId and t_pinCheOrder.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个拼车订单记录 -->
+	<select id="getPinCheOrder" parameterType="int" resultMap="pinCheOrderMap">
+		select * from t_pinCheOrder where t_pinCheOrder.orderId = #{orderId}
+	</select>
+
+	<!-- 更新拼车订单记录 -->
+	<update id="updatePinCheOrder" parameterType="pinCheOrder">
+		update t_pinCheOrder set pinCheObj=#{pinCheObj.pincheId},userObj=#{userObj.user_name},personNum=#{personNum},orderTime=#{orderTime} where orderId = #{orderId}
+	</update>
+
+	<!-- 删除拼车订单记录 -->
+	<delete id="deletePinCheOrder" parameterType="int">
+		delete from t_pinCheOrder where orderId=#{orderId}
+	</delete>
+
+</mapper>

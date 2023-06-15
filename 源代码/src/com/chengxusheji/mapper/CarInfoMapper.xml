@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.CarInfoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加小车记录 -->
+	<insert id="addCarInfo" parameterType="carInfo">
+		insert into t_carInfo(carNo,chexing,carPhoto,buyYear,jiaShiZheng,xueShenZheng,carDesc,userObj,shenHeState,addTime) values 
+		(#{carNo},#{chexing},#{carPhoto},#{buyYear},#{jiaShiZheng},#{xueShenZheng},#{carDesc},#{userObj.user_name},#{shenHeState},#{addTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询小车记录 -->
+	<select id="queryCarInfo" resultMap="carInfoMap" >
+		select t_carInfo.* from t_carInfo,t_userInfo ${where} and t_carInfo.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="carInfoMap" type="carInfo">
+        <id property="carNo" column="carNo" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有小车记录 -->
+	<select id="queryCarInfoList" resultMap="carInfoMap" >
+		select t_carInfo.* from t_carInfo,t_userInfo ${where} and t_carInfo.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的小车记录数 -->
+	<select id="queryCarInfoCount" resultType="int">
+		select count(*) from t_carInfo,t_userInfo ${where} and t_carInfo.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个小车记录 -->
+	<select id="getCarInfo" parameterType="string" resultMap="carInfoMap">
+		select * from t_carInfo where t_carInfo.carNo = #{carNo}
+	</select>
+
+	<!-- 更新小车记录 -->
+	<update id="updateCarInfo" parameterType="carInfo">
+		update t_carInfo set chexing=#{chexing},carPhoto=#{carPhoto},buyYear=#{buyYear},jiaShiZheng=#{jiaShiZheng},xueShenZheng=#{xueShenZheng},carDesc=#{carDesc},userObj=#{userObj.user_name},shenHeState=#{shenHeState},addTime=#{addTime} where carNo = #{carNo}
+	</update>
+
+	<!-- 删除小车记录 -->
+	<delete id="deleteCarInfo" parameterType="string">
+		delete from t_carInfo where carNo=#{carNo}
+	</delete>
+
+</mapper>

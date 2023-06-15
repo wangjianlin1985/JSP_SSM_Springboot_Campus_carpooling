@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.PinCheMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加拼车记录 -->
+	<insert id="addPinChe" parameterType="pinChe">
+		insert into t_pinChe(carObj,pinChePhoto,startTime,startPlace,endPlace,price,totalNum,haveNum) values 
+		(#{carObj.carNo},#{pinChePhoto},#{startTime},#{startPlace},#{endPlace},#{price},#{totalNum},#{haveNum})
+	</insert>
+
+	<!-- 按照查询条件分页查询拼车记录 -->
+	<select id="queryPinChe" resultMap="pinCheMap" >
+		select t_pinChe.* from t_pinChe,t_carInfo,t_userInfo ${where} and  t_pinChe.carObj = t_carInfo.carNo and t_carInfo.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="pinCheMap" type="pinChe">
+        <id property="pincheId" column="pincheId" />
+        <association property="carObj" column="carObj" select="com.chengxusheji.mapper.CarInfoMapper.getCarInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有拼车记录 -->
+	<select id="queryPinCheList" resultMap="pinCheMap" >
+		select t_pinChe.* from t_pinChe,t_carInfo ${where} and t_pinChe.carObj = t_carInfo.carNo
+	</select>
+
+    <!-- 按照查询条件的拼车记录数 -->
+	<select id="queryPinCheCount" resultType="int">
+		select count(*) from t_pinChe,t_carInfo,t_userInfo  ${where} and t_pinChe.carObj = t_carInfo.carNo and t_carInfo.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个拼车记录 -->
+	<select id="getPinChe" parameterType="int" resultMap="pinCheMap">
+		select * from t_pinChe where t_pinChe.pincheId = #{pincheId}
+	</select>
+
+	<!-- 更新拼车记录 -->
+	<update id="updatePinChe" parameterType="pinChe">
+		update t_pinChe set carObj=#{carObj.carNo},pinChePhoto=#{pinChePhoto},startTime=#{startTime},startPlace=#{startPlace},endPlace=#{endPlace},price=#{price},totalNum=#{totalNum},haveNum=#{haveNum} where pincheId = #{pincheId}
+	</update>
+
+	<!-- 删除拼车记录 -->
+	<delete id="deletePinChe" parameterType="int">
+		delete from t_pinChe where pincheId=#{pincheId}
+	</delete>
+
+</mapper>
